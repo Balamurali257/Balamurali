@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}User Management – CareBuddy Admin{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Registered Users</h3>
+            <p class="text-muted text-sm mb-0">View registered accounts, verify status, and manage access privileges</p>
+        </div>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+            <i class="bi bi-arrow-left me-1"></i> Admin Dashboard
+        </a>
+    </div>
+
+    <!-- Search -->
+    <div class="col-12">
+        <div class="card border-0 rounded-4 shadow-sm bg-white p-3">
+            <form method="GET" action="{{ url_for('admin.users') }}" class="d-flex gap-2">
+                <input type="text" name="search" class="form-control text-sm" placeholder="Search by name, email, or username..." value="{{ search }}">
+                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="col-12">
+        <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-sm">
+                    <thead class="table-light text-muted text-xs text-uppercase fw-bold">
+                        <tr>
+                            <th class="ps-4">User</th>
+                            <th>Mobile Phone</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if users %}
+                            {% for u in users %}
+                            <tr>
+                                <td class="ps-4">
+                                    <strong class="text-dark d-block">{{ u.name }}</strong>
+                                    <small class="text-muted text-xs">@{{ u.username or 'user' }} • {{ u.email or 'No email' }}</small>
+                                </td>
+                                <td>
+                                    <span class="font-monospace text-xs">{{ u.phone_number or u.phone or 'N/A' }}</span>
+                                    {% if u.phone_verified %}
+                                    <i class="bi bi-patch-check-fill text-success ms-1" title="Verified Phone"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {% if u.role == 'ADMIN' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill text-[11px]">
+                                        {{ u.role }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if u.is_active %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Disabled</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted text-xs">{{ u.created_at }}</td>
+                                <td class="text-end pe-4">
+                                    <form action="{{ url_for('admin.toggle_user_status', user_id=u.id) }}" method="POST" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        {% if u.is_active %}
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="return confirm('Disable this account?')">
+                                            Disable
+                                        </button>
+                                        {% else %}
+                                        <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                                            Enable
+                                        </button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No users found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

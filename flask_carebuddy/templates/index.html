@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}CareBuddy – Secure Digital Medical & Life Document Vault{% endblock %}
+
+{% block public_content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3 shadow-xs">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-dark" href="{{ url_for('auth.landing') }}">
+            <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;">
+                <i class="bi bi-shield-lock-fill fs-5"></i>
+            </div>
+            <span>CareBuddy</span>
+        </a>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">Get Started</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="py-5 text-center position-relative overflow-hidden" style="background: radial-gradient(circle at 50% 0%, #e0f2fe 0%, #f8fafc 70%);">
+    <div class="container py-4 py-md-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3.5 py-2 mb-3 fw-bold">
+                    <i class="bi bi-shield-check me-1"></i> Medical Life Document Security
+                </span>
+                <h1 class="display-4 fw-extrabold text-dark tracking-tight mb-3">
+                    Your medical records. Organized. Secure. Always accessible.
+                </h1>
+                <p class="lead text-muted mb-4 px-md-5">
+                    CareBuddy is a private digital medical vault that organizes your health reports, prescriptions, and diagnostics, tracks reminder schedules, and generates time-limited QR access for doctors.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm">
+                        Create Free Vault
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-light border btn-lg rounded-pill px-4 py-3 fw-semibold">
+                        Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Feature Pillars -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-dark">Built for Personal & Family Health Records</h2>
+            <p class="text-muted">A dedicated personal repository engineered for instant retrieval and emergency safety.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card p-4 h-100 border rounded-4 shadow-xs">
+                    <div class="bg-primary-subtle text-primary rounded-3 p-3 mb-3 d-inline-block" style="width: 50px; height: 50px;">
+                        <i class="bi bi-folder2-open fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Categorized Medical Vault</h5>
+                    <p class="text-muted text-sm mb-0">Organize blood panels, X-rays, MRI scans, and doctor prescriptions with instant metadata search and sorting.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-4 h-100 border rounded-4 shadow-xs">
+                    <div class="bg-danger-subtle text-danger rounded-3 p-3 mb-3 d-inline-block" style="width: 50px; height: 50px;">
+                        <i class="bi bi-heart-pulse-fill fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Emergency Medical Card</h5>
+                    <p class="text-muted text-sm mb-0">Instant display of blood type, acute drug allergies, chronic conditions, and direct In-Case-of-Emergency (ICE) dials.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-4 h-100 border rounded-4 shadow-xs">
+                    <div class="bg-success-subtle text-success rounded-3 p-3 mb-3 d-inline-block" style="width: 50px; height: 50px;">
+                        <i class="bi bi-qr-code fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Zero-Trust QR Sharing</h5>
+                    <p class="text-muted text-sm mb-0">Share single documents with consulting physicians via expiring, PIN-protected QR codes without exposing your entire vault.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-4 bg-light text-center text-muted text-sm mt-auto border-top">
+    <div class="container">
+        <p class="mb-0">© 2026 CareBuddy – Secure Digital Medical & Life Document Vault. Built with Flask & MySQL.</p>
+    </div>
+</footer>
+{% endblock %}

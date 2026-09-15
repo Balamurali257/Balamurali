@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard – CareBuddy{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Welcome Header -->
+    <div class="col-12">
+        <div class="card bg-dark text-white border-0 overflow-hidden shadow-sm p-4 p-md-5" style="background: linear-gradient(135deg, #0f172a 0%, #0369a1 100%);">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h2 class="fw-bold mb-1">Good day, {{ session.get('name') }} 👋</h2>
+                    <p class="text-white-50 mb-0">Your medical documents, allergies, and emergency records are organized and secure.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('reports.upload') }}" class="btn btn-light fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-cloud-arrow-up-fill me-1 text-primary"></i> Upload Report
+                    </a>
+                    <a href="{{ url_for('profile.emergency_card') }}" class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-heart-pulse-fill me-1"></i> Emergency Card
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Metric Cards -->
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted text-xs text-uppercase fw-bold">Total Reports</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ reports_count }}</h3>
+                </div>
+                <div class="bg-primary-subtle text-primary p-3 rounded-4">
+                    <i class="bi bi-file-earmark-medical fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted text-xs text-uppercase fw-bold">Storage Used</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ storage_mb }} MB</h3>
+                </div>
+                <div class="bg-info-subtle text-info p-3 rounded-4">
+                    <i class="bi bi-hdd-network fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted text-xs text-uppercase fw-bold">Reminders Due</span>
+                    <h3 class="fw-bold mb-0 mt-1">{{ reminders_count }}</h3>
+                </div>
+                <div class="bg-warning-subtle text-warning p-3 rounded-4">
+                    <i class="bi bi-bell-fill fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card p-3 h-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-muted text-xs text-uppercase fw-bold">Vault Security</span>
+                    <h3 class="fw-bold mb-0 mt-1 text-success">Active</h3>
+                </div>
+                <div class="bg-success-subtle text-success p-3 rounded-4">
+                    <i class="bi bi-shield-check fs-4"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reports & Quick List -->
+    <div class="col-lg-8">
+        <div class="card h-100">
+            <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Medical Reports</h5>
+                <a href="{{ url_for('reports.index') }}" class="btn btn-sm btn-outline-primary rounded-pill">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_reports %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Report Name</th>
+                                <th>Category</th>
+                                <th>Hospital / Doctor</th>
+                                <th>Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recent_reports %}
+                            <tr>
+                                <td class="fw-bold text-dark">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi {{ r.icon_class }} fs-5" style="color: {{ r.color_code }};"></i>
+                                        <span>{{ r.report_name }}</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge rounded-pill bg-light text-dark border">{{ r.category_name }}</span></td>
+                                <td class="text-muted text-sm">{{ r.hospital_name or '—' }}</td>
+                                <td class="text-muted text-sm">{{ r.report_date }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('reports.view', report_id=r.id) }}" class="btn btn-sm btn-light border rounded-pill">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-folder2-open text-muted" style="font-size: 3rem;"></i>
+                    <h6 class="fw-bold mt-2">No medical reports uploaded yet</h6>
+                    <p class="text-muted text-sm">Upload your lab tests, prescriptions, and diagnostics to get started.</p>
+                    <a href="{{ url_for('reports.upload') }}" class="btn btn-primary btn-sm rounded-pill px-3">Upload First Report</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Reminders & Activity Log -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-alarm me-2 text-warning"></i>Upcoming Reminders</h5>
+            </div>
+            <div class="card-body">
+                {% if upcoming_reminders %}
+                <div class="list-group list-group-flush">
+                    {% for rem in upcoming_reminders %}
+                    <div class="list-group-item px-0 py-2 border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-sm">{{ rem.title }}</span>
+                            <span class="badge bg-warning-subtle text-dark text-xs">{{ rem.reminder_date }}</span>
+                        </div>
+                        <small class="text-muted text-xs">{{ rem.description or 'No extra notes' }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-sm mb-0">No upcoming reminders scheduled.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-activity me-2 text-info"></i>Recent Activity</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for act in activities %}
+                    <li class="list-group-item text-xs text-muted border-0 py-2.5">
+                        <span class="fw-bold text-dark">{{ act.action_type }}:</span> {{ act.description }}
+                        <div class="text-muted text-xxs mt-0.5">{{ act.created_at }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

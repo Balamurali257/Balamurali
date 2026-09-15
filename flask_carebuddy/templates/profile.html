@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Profile – CareBuddy Vault{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Patient Health Profile</h3>
+                <p class="text-muted text-sm mb-0">Manage your personal medical identity, emergency contacts, and physician records</p>
+            </div>
+            <a href="{{ url_for('profile.emergency_card') }}" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-semibold">
+                <i class="bi bi-heart-pulse-fill me-1"></i> View Emergency Card
+            </a>
+        </div>
+
+        <div class="card border-0 rounded-4 shadow-sm bg-white p-4 p-md-5">
+            <form action="{{ url_for('profile.index') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                <h5 class="fw-bold text-primary mb-3"><i class="bi bi-person-lines-fill me-2"></i>Personal Information</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Full Name</label>
+                        <input type="text" class="form-control" value="{{ profile.name }}" readonly disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Email Address</label>
+                        <input type="email" class="form-control" value="{{ profile.email or '' }}" readonly disabled>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-sm fw-semibold text-dark">Date of Birth</label>
+                        <input type="date" name="date_of_birth" class="form-control" value="{{ profile.date_of_birth or '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-sm fw-semibold text-dark">Gender</label>
+                        <select name="gender" class="form-select">
+                            <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
+                            <option value="Prefer not to say" {% if profile.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-sm fw-semibold text-dark">Blood Group</label>
+                        <select name="blood_group" class="form-select fw-bold text-danger">
+                            {% for bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                            <option value="{{ bg }}" {% if profile.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Contact Phone</label>
+                        <input type="tel" name="phone" class="form-control" value="{{ profile.phone or '' }}" placeholder="+1 (555) 000-0000">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Home Address</label>
+                        <input type="text" name="address" class="form-control" value="{{ profile.address or '' }}" placeholder="City, State">
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="fw-bold text-danger mb-3"><i class="bi bi-shield-plus me-2"></i>Critical Health & Medical Records</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-danger">Known Allergies (Drugs, Foods, Latex)</label>
+                        <textarea name="allergies" class="form-control" rows="3" placeholder="e.g. Penicillin, Peanuts, Iodine">{{ profile.allergies or '' }}</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-warning-emphasis">Chronic Medical Conditions</label>
+                        <textarea name="medical_conditions" class="form-control" rows="3" placeholder="e.g. Asthma, Type 2 Diabetes, Hypertension">{{ profile.medical_conditions or '' }}</textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-sm fw-semibold text-dark">Active Daily Medications & Dosages</label>
+                        <textarea name="current_medications" class="form-control" rows="2" placeholder="e.g. Lisinopril 10mg once daily, Metformin 500mg">{{ profile.current_medications or '' }}</textarea>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="fw-bold text-success mb-3"><i class="bi bi-telephone-plus me-2"></i>Emergency Contacts & Physician</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Emergency Contact Name</label>
+                        <input type="text" name="emergency_contact_name" class="form-control" value="{{ profile.emergency_contact_name or '' }}" placeholder="Name & Relationship">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Emergency Contact Phone</label>
+                        <input type="tel" name="emergency_contact_phone" class="form-control" value="{{ profile.emergency_contact_phone or '' }}" placeholder="+1 (555) 999-9999">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Primary Care Physician</label>
+                        <input type="text" name="primary_physician" class="form-control" value="{{ profile.primary_physician or '' }}" placeholder="Dr. Jane Smith, MD">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Physician Phone</label>
+                        <input type="tel" name="physician_phone" class="form-control" value="{{ profile.physician_phone or '' }}" placeholder="+1 (555) 888-8888">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Insurance Provider</label>
+                        <input type="text" name="insurance_provider" class="form-control" value="{{ profile.insurance_provider or '' }}" placeholder="e.g. Blue Cross Shield">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-sm fw-semibold text-dark">Policy / Member ID</label>
+                        <input type="text" name="insurance_policy_number" class="form-control" value="{{ profile.insurance_policy_number or '' }}" placeholder="BCS-12345678">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                        Save Profile Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

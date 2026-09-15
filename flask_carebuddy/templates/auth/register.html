@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account – CareBuddy Digital Health Vault{% endblock %}
+
+{% block public_content %}
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center g-5">
+
+        <!-- Left Column: Patient Vault Value Prop -->
+        <div class="col-lg-5 d-none d-lg-block">
+            <div class="pe-lg-4">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <div class="bg-primary text-white rounded-4 p-2.5 d-flex align-items-center justify-content-center shadow-sm" style="width: 48px; height: 48px;">
+                        <i class="bi bi-shield-plus fs-3"></i>
+                    </div>
+                    <span class="fs-2 fw-bold text-dark tracking-tight">CareBuddy</span>
+                </div>
+                
+                <h2 class="fw-bold text-dark lh-sm mb-3">
+                    Start your unified, confidential health vault.
+                </h2>
+                <p class="text-secondary mb-4 leading-relaxed">
+                    Keep your lab results, prescriptions, and medical emergency profile safe from data loss and accessible when every second counts.
+                </p>
+
+                <div class="vstack gap-3 text-sm text-secondary mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary-subtle text-primary rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                            <i class="bi bi-qr-code-scan fs-6"></i>
+                        </div>
+                        <span>Instant PIN-protected Emergency Medical Card QR</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-success-subtle text-success rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                            <i class="bi bi-check2-circle fs-6"></i>
+                        </div>
+                        <span>Direct 2FA phone verification via Twilio Verify</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning-subtle text-warning rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                            <i class="bi bi-file-earmark-medical fs-6"></i>
+                        </div>
+                        <span>Categorized diagnostic reports with file integrity tracking</span>
+                    </div>
+                </div>
+
+                <div class="border-top pt-3 text-xs text-muted">
+                    <i class="bi bi-shield-shaded text-primary me-1"></i> CareBuddy never shares or exposes your medical data to third parties.
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Registration Form -->
+        <div class="col-12 col-sm-10 col-md-9 col-lg-6">
+            <!-- Mobile Header -->
+            <div class="text-center mb-4 d-lg-none">
+                <a href="{{ url_for('auth.landing') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                    <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
+                        <i class="bi bi-shield-plus fs-4"></i>
+                    </div>
+                    <span class="fs-3 fw-bold text-dark tracking-tight">CareBuddy</span>
+                </a>
+                <p class="text-muted text-sm mt-1 mb-0">Create your secure vault</p>
+            </div>
+
+            <!-- Card -->
+            <div class="card border-0 rounded-4 shadow-sm p-4 p-sm-4 bg-white">
+                <div class="mb-3 text-center text-lg-start">
+                    <h3 class="fw-bold text-dark mb-1">Create Account</h3>
+                    <p class="text-muted text-sm mb-0">Fill in your details to establish your encrypted health profile.</p>
+                </div>
+
+                <form action="{{ url_for('auth.register') }}" method="POST" id="registerForm" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label class="form-label text-sm fw-semibold text-dark mb-1" for="nameInput">
+                            Full Name <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+                                <i class="bi bi-person-badge"></i>
+                            </span>
+                            <input type="text" 
+                                   name="name" 
+                                   id="nameInput"
+                                   class="form-control border-start-0 py-2.5 text-sm" 
+                                   placeholder="e.g. Rahul Sharma" 
+                                   value="{{ name or '' }}" 
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Username & Phone in 2-column on desktop -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1" for="usernameInput">
+                                Username <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted ps-2.5">
+                                    <i class="bi bi-at"></i>
+                                </span>
+                                <input type="text" 
+                                       name="username" 
+                                       id="usernameInput"
+                                       class="form-control border-start-0 py-2.5 text-sm" 
+                                       placeholder="john_doe" 
+                                       value="{{ username or '' }}" 
+                                       required>
+                            </div>
+                            <span class="text-muted text-[11px]">3–30 letters, numbers, dot, or underscore</span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1" for="phoneInput">
+                                Mobile Phone <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted ps-2.5">
+                                    <i class="bi bi-phone"></i>
+                                </span>
+                                <input type="tel" 
+                                       name="phone" 
+                                       id="phoneInput"
+                                       class="form-control border-start-0 py-2.5 text-sm" 
+                                       placeholder="+919876543210" 
+                                       value="{{ phone or '' }}" 
+                                       required>
+                            </div>
+                            <span class="text-muted text-[11px]">Includes country code (e.g. +91)</span>
+                        </div>
+                    </div>
+
+                    <!-- Email (Optional) -->
+                    <div class="mb-3">
+                        <label class="form-label text-sm fw-semibold text-dark mb-1" for="emailInput">
+                            Email Address <span class="text-muted text-xs fw-normal">(Optional)</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+                                <i class="bi bi-envelope"></i>
+                            </span>
+                            <input type="email" 
+                                   name="email" 
+                                   id="emailInput"
+                                   class="form-control border-start-0 py-2.5 text-sm" 
+                                   placeholder="rahul@example.com" 
+                                   value="{{ email or '' }}">
+                        </div>
+                    </div>
+
+                    <!-- Password & Confirm Password -->
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1" for="regPassword">
+                                Password <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       name="password" 
+                                       id="regPassword" 
+                                       class="form-control py-2.5 text-sm" 
+                                       placeholder="••••••••" 
+                                       required>
+                                <button class="btn btn-outline-secondary bg-light text-muted px-2.5" 
+                                        type="button" 
+                                        id="toggleRegPwBtn">
+                                    <i class="bi bi-eye" id="toggleRegPwIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label text-sm fw-semibold text-dark mb-1" for="regConfirmPassword">
+                                Confirm Password <span class="text-danger">*</span>
+                            </label>
+                            <input type="password" 
+                                   name="confirm_password" 
+                                   id="regConfirmPassword" 
+                                   class="form-control py-2.5 text-sm" 
+                                   placeholder="••••••••" 
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Real-time Password Complexity Indicator -->
+                    <div class="card bg-light border-0 p-2.5 rounded-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1.5">
+                            <span class="text-xs fw-semibold text-secondary">Password Security:</span>
+                            <span class="text-xs fw-bold" id="pwStrengthLabel">Weak</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 4px;">
+                            <div class="progress-bar bg-danger" id="pwProgressBar" style="width: 20%;"></div>
+                        </div>
+                        <div class="row g-1 text-[11px] text-muted">
+                            <div class="col-6" id="rule-len"><i class="bi bi-circle me-1"></i> 8+ Characters</div>
+                            <div class="col-6" id="rule-upper"><i class="bi bi-circle me-1"></i> 1 Uppercase</div>
+                            <div class="col-6" id="rule-lower"><i class="bi bi-circle me-1"></i> 1 Lowercase</div>
+                            <div class="col-6" id="rule-num"><i class="bi bi-circle me-1"></i> 1 Number / Special</div>
+                        </div>
+                    </div>
+
+                    <!-- Terms Agreement -->
+                    <div class="form-check mb-3 text-xs">
+                        <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" required>
+                        <label class="form-check-label text-secondary" for="agreeTerms">
+                            I understand and agree to the <span class="text-primary fw-semibold">Terms of Service</span> and <span class="text-primary fw-semibold">Healthcare Privacy Policy</span>.
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            id="submitRegBtn" 
+                            class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                        <span id="regBtnText">Create Secure Vault</span>
+                        <div class="spinner-border spinner-border-sm d-none" id="regSpinner" role="status"></div>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="d-flex align-items-center my-4">
+                    <hr class="flex-grow-1 border-secondary-subtle">
+                    <span class="px-2 text-muted text-xs text-uppercase fw-bold tracking-wider">OR REGISTER WITH</span>
+                    <hr class="flex-grow-1 border-secondary-subtle">
+                </div>
+
+                <!-- Social Sign In Providers -->
+                <div class="row g-2">
+                    <div class="col-4">
+                        {% if providers.google %}
+                        <a href="{{ url_for('oauth.google_login') }}" class="btn btn-outline-secondary rounded-pill py-2 w-100 text-xs fw-semibold d-flex align-items-center justify-content-center gap-1">
+                            <i class="bi bi-google text-danger"></i> Google
+                        </a>
+                        {% else %}
+                        <button type="button" class="btn btn-outline-secondary rounded-pill py-2 w-100 text-xs fw-semibold opacity-60" onclick="showConfigNotice('Google', 'GOOGLE_CLIENT_ID')">
+                            <i class="bi bi-google text-danger"></i> Google
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="col-4">
+                        {% if providers.facebook %}
+                        <a href="{{ url_for('oauth.facebook_login') }}" class="btn btn-outline-secondary rounded-pill py-2 w-100 text-xs fw-semibold d-flex align-items-center justify-content-center gap-1">
+                            <i class="bi bi-facebook text-primary"></i> Facebook
+                        </a>
+                        {% else %}
+                        <button type="button" class="btn btn-outline-secondary rounded-pill py-2 w-100 text-xs fw-semibold opacity-60" onclick="showConfigNotice('Facebook', 'FACEBOOK_APP_ID')">
+                            <i class="bi bi-facebook text-primary"></i> Facebook
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="col-4">
+                        {% if providers.apple %}
+                        <a href="{{ url_for('oauth.apple_login') }}" class="btn btn-outline-secondary rounded-pill py-2 w-100 text-xs fw-semibold d-flex align-items-center justify-content-center gap-1">
+                            <i class="bi bi-apple text-dark"></i> Apple
+                        </a>
+                        {% else %}
+                        <button type="button" class="btn btn-outline-secondary rounded-pill py-2 w-100 text-xs fw-semibold opacity-60" onclick="showConfigNotice('Apple', 'APPLE_CLIENT_ID')">
+                            <i class="bi bi-apple text-dark"></i> Apple
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Login Footer -->
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted text-xs mb-0">
+                        Already have a CareBuddy vault? 
+                        <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold text-decoration-none ms-1">
+                            Sign In
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// Password toggle
+const toggleRegPwBtn = document.getElementById('toggleRegPwBtn');
+const regPassword = document.getElementById('regPassword');
+const toggleRegPwIcon = document.getElementById('toggleRegPwIcon');
+
+if (toggleRegPwBtn) {
+    toggleRegPwBtn.addEventListener('click', () => {
+        const isPw = regPassword.type === 'password';
+        regPassword.type = isPw ? 'text' : 'password';
+        toggleRegPwIcon.className = isPw ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+}
+
+// Live password strength indicator
+const pwInput = document.getElementById('regPassword');
+const pwProgressBar = document.getElementById('pwProgressBar');
+const pwStrengthLabel = document.getElementById('pwStrengthLabel');
+
+const ruleLen = document.getElementById('rule-len');
+const ruleUpper = document.getElementById('rule-upper');
+const ruleLower = document.getElementById('rule-lower');
+const ruleNum = document.getElementById('rule-num');
+
+function updateRule(el, passed) {
+    if (passed) {
+        el.className = el.className.replace('text-muted', 'text-success fw-bold');
+        el.querySelector('i').className = 'bi bi-check-circle-fill me-1 text-success';
+    } else {
+        el.className = el.className.replace('text-success fw-bold', 'text-muted');
+        el.querySelector('i').className = 'bi bi-circle me-1 text-muted';
+    }
+}
+
+if (pwInput) {
+    pwInput.addEventListener('input', () => {
+        const val = pwInput.value;
+        const hasLen = val.length >= 8;
+        const hasUpper = /[A-Z]/.test(val);
+        const hasLower = /[a-z]/.test(val);
+        const hasNumOrSpecial = /[\d!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(val);
+
+        updateRule(ruleLen, hasLen);
+        updateRule(ruleUpper, hasUpper);
+        updateRule(ruleLower, hasLower);
+        updateRule(ruleNum, hasNumOrSpecial);
+
+        const score = [hasLen, hasUpper, hasLower, hasNumOrSpecial].filter(Boolean).length;
+        if (score === 0) {
+            pwProgressBar.style.width = '0%';
+            pwStrengthLabel.textContent = 'None';
+            pwStrengthLabel.className = 'text-xs fw-bold text-secondary';
+        } else if (score <= 2) {
+            pwProgressBar.style.width = '35%';
+            pwProgressBar.className = 'progress-bar bg-danger';
+            pwStrengthLabel.textContent = 'Weak';
+            pwStrengthLabel.className = 'text-xs fw-bold text-danger';
+        } else if (score === 3) {
+            pwProgressBar.style.width = '70%';
+            pwProgressBar.className = 'progress-bar bg-warning';
+            pwStrengthLabel.textContent = 'Good';
+            pwStrengthLabel.className = 'text-xs fw-bold text-warning';
+        } else {
+            pwProgressBar.style.width = '100%';
+            pwProgressBar.className = 'progress-bar bg-success';
+            pwStrengthLabel.textContent = 'Strong';
+            pwStrengthLabel.className = 'text-xs fw-bold text-success';
+        }
+    });
+}
+
+// Form Submission prevention
+const regForm = document.getElementById('registerForm');
+const submitRegBtn = document.getElementById('submitRegBtn');
+const regBtnText = document.getElementById('regBtnText');
+const regSpinner = document.getElementById('regSpinner');
+
+if (regForm) {
+    regForm.addEventListener('submit', function(e) {
+        if (!regForm.checkValidity()) return;
+        submitRegBtn.disabled = true;
+        regBtnText.textContent = 'Securing account...';
+        regSpinner.classList.remove('d-none');
+    });
+}
+
+function showConfigNotice(provider, key) {
+    alert(`${provider} authentication is not configured yet. Set ${key} in .env to activate.`);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+{
+  "name": "CareBuddy Vault – AI-Powered Secure Digital Document Management System",
+  "description": "Final-year UG Computer Science Project: Secure digital document management system with OCR, AI Copilot, role-based access control, encryption, and admin analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

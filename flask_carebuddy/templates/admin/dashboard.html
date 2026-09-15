@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Control Panel – CareBuddy{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">System Administration</h3>
+            <p class="text-muted text-sm mb-0">Platform overview, user accounts, storage metrics, and global audit feed</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-shield-check me-1"></i> Security Logs
+            </a>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="bi bi-people me-1"></i> Manage Users
+            </a>
+        </div>
+    </div>
+
+    <!-- Admin Metric Cards -->
+    <div class="col-sm-6 col-lg-3">
+        <div class="card p-3 border-0 rounded-4 shadow-sm bg-white">
+            <span class="text-muted text-xs fw-bold text-uppercase">Total Users</span>
+            <h2 class="fw-bold text-dark mb-0 mt-1">{{ users_count }}</h2>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card p-3 border-0 rounded-4 shadow-sm bg-white">
+            <span class="text-muted text-xs fw-bold text-uppercase">Total Documents</span>
+            <h2 class="fw-bold text-dark mb-0 mt-1">{{ reports_count }}</h2>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card p-3 border-0 rounded-4 shadow-sm bg-white">
+            <span class="text-muted text-xs fw-bold text-uppercase">Storage Consumed</span>
+            <h2 class="fw-bold text-dark mb-0 mt-1">{{ storage_mb }} MB</h2>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card p-3 border-0 rounded-4 shadow-sm bg-white">
+            <span class="text-muted text-xs fw-bold text-uppercase">Categories</span>
+            <h2 class="fw-bold text-dark mb-0 mt-1">{{ categories|length }}</h2>
+        </div>
+    </div>
+
+    <!-- Recent Global Activity -->
+    <div class="col-12">
+        <div class="card border-0 rounded-4 shadow-sm bg-white p-4">
+            <h5 class="fw-bold text-dark mb-3">Recent System Events</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-xs mb-0">
+                    <thead class="table-light text-muted">
+                        <tr>
+                            <th>User</th>
+                            <th>Action Type</th>
+                            <th>Description</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recent_activity %}
+                            {% for act in recent_activity %}
+                            <tr>
+                                <td><strong>{{ act.user_name }}</strong> ({{ act.user_email }})</td>
+                                <td><span class="badge bg-light text-dark border font-monospace">{{ act.action_type }}</span></td>
+                                <td class="text-secondary">{{ act.description }}</td>
+                                <td class="text-muted">{{ act.created_at }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="4" class="text-center text-muted py-3">No system activity logged yet.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

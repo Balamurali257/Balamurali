@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In – CareBuddy Digital Health Vault{% endblock %}
+
+{% block head %}
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+{% endblock %}
+
+{% block public_content %}
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center g-5">
+        
+        <!-- Left Branding & Trust Column (Desktop) -->
+        <div class="col-lg-5 d-none d-lg-block">
+            <div class="pe-lg-4">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <div class="bg-primary text-white rounded-4 p-2.5 d-flex align-items-center justify-content-center shadow-sm" style="width: 48px; height: 48px;">
+                        <i class="bi bi-shield-lock-fill fs-3"></i>
+                    </div>
+                    <span class="fs-2 fw-bold text-dark tracking-tight">CareBuddy</span>
+                </div>
+                
+                <h2 class="fw-bold text-dark lh-sm mb-3">
+                    Your secure digital medical & life document vault.
+                </h2>
+                <p class="text-secondary mb-4 leading-relaxed">
+                    Store confidential health reports, access your instant emergency card, and share critical diagnostics with authorized physicians in seconds.
+                </p>
+
+                <div class="vstack gap-3 text-sm text-secondary mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary-subtle text-primary rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                            <i class="bi bi-shield-check fs-6"></i>
+                        </div>
+                        <span>Strict medical document ownership and IDOR protection</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-success-subtle text-success rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                            <i class="bi bi-phone fs-6"></i>
+                        </div>
+                        <span>Carrier-grade 2FA via Twilio SMS & WhatsApp Verify</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-info-subtle text-info rounded-circle p-1.5 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                            <i class="bi bi-person-badge fs-6"></i>
+                        </div>
+                        <span>Verified Google, Facebook & Apple single sign-on</span>
+                    </div>
+                </div>
+
+                <div class="border-top pt-3 text-xs text-muted">
+                    <i class="bi bi-lock-fill text-success me-1"></i> End-to-end access control & cryptographic session protection.
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Auth Form Column -->
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+            <!-- Mobile Brand Header -->
+            <div class="text-center mb-4 d-lg-none">
+                <a href="{{ url_for('auth.landing') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                    <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
+                        <i class="bi bi-shield-lock-fill fs-4"></i>
+                    </div>
+                    <span class="fs-3 fw-bold text-dark tracking-tight">CareBuddy</span>
+                </a>
+                <p class="text-muted text-sm mt-1 mb-0">Secure health vault access</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="card border-0 rounded-4 shadow-sm p-4 p-sm-4 bg-white">
+                <div class="mb-3 text-center text-lg-start">
+                    <h3 class="fw-bold text-dark mb-1">Welcome back</h3>
+                    <p class="text-muted text-sm mb-0">Sign in using your username, verified phone, or email.</p>
+                </div>
+
+                <form action="{{ url_for('auth.login') }}" method="POST" id="loginForm" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+                    <!-- Username / Phone / Email -->
+                    <div class="mb-3">
+                        <label class="form-label text-sm fw-semibold text-dark mb-1" for="loginIdentifier">
+                            Username, Phone, or Email
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+                                <i class="bi bi-person"></i>
+                            </span>
+                            <input type="text" 
+                                   name="identifier" 
+                                   id="loginIdentifier"
+                                   class="form-control border-start-0 py-2.5 text-sm" 
+                                   placeholder="Username or +919876543210" 
+                                   value="{{ identifier or '' }}" 
+                                   required 
+                                   autofocus>
+                        </div>
+                    </div>
+
+                    <!-- Password with Toggle -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label text-sm fw-semibold text-dark mb-0" for="loginPassword">
+                                Password
+                            </label>
+                            <a href="{{ url_for('auth.forgot_password') }}" class="text-primary text-xs fw-semibold text-decoration-none">
+                                Forgot password?
+                            </a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            <input type="password" 
+                                   name="password" 
+                                   id="loginPassword" 
+                                   class="form-control border-start-0 border-end-0 py-2.5 text-sm" 
+                                   placeholder="••••••••" 
+                                   required>
+                            <button class="btn btn-outline-secondary border-start-0 bg-light text-muted px-3" 
+                                    type="button" 
+                                    id="togglePasswordBtn" 
+                                    aria-label="Toggle password visibility">
+                                <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Remember me -->
+                    <div class="form-check mb-4 text-xs">
+                        <input class="form-check-input" type="checkbox" name="remember_me" id="rememberMe" checked>
+                        <label class="form-check-label text-muted" for="rememberMe">
+                            Stay signed in on this device for 7 days
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            id="submitLoginBtn" 
+                            class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                        <span id="loginBtnText">Sign In to Vault</span>
+                        <div class="spinner-border spinner-border-sm d-none" id="loginSpinner" role="status"></div>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="d-flex align-items-center my-4">
+                    <hr class="flex-grow-1 border-secondary-subtle">
+                    <span class="px-2 text-muted text-xs text-uppercase fw-bold tracking-wider">OR CONTINUE WITH</span>
+                    <hr class="flex-grow-1 border-secondary-subtle">
+                </div>
+
+                <!-- Social Sign In Providers -->
+                <div class="d-grid gap-2">
+                    <!-- Google Login -->
+                    {% if providers.google %}
+                    <a href="{{ url_for('oauth.google_login') }}" 
+                       class="btn btn-outline-secondary rounded-pill py-2 text-sm fw-semibold d-flex align-items-center justify-content-center gap-2">
+                        <svg width="18" height="18" viewBox="0 0 48 48">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                        <span>Continue with Google</span>
+                    </a>
+                    {% else %}
+                    <button type="button" 
+                            class="btn btn-outline-secondary rounded-pill py-2 text-sm fw-semibold d-flex align-items-center justify-content-center gap-2 opacity-60"
+                            onclick="showConfigNotice('Google', 'GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET')">
+                        <svg width="18" height="18" viewBox="0 0 48 48">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                        <span>Continue with Google</span>
+                        <span class="badge bg-secondary-subtle text-secondary text-[10px] rounded-pill">Unconfigured</span>
+                    </button>
+                    {% endif %}
+
+                    <!-- Facebook Login -->
+                    {% if providers.facebook %}
+                    <a href="{{ url_for('oauth.facebook_login') }}" 
+                       class="btn btn-outline-secondary rounded-pill py-2 text-sm fw-semibold d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-facebook text-primary fs-5"></i>
+                        <span>Continue with Facebook</span>
+                    </a>
+                    {% else %}
+                    <button type="button" 
+                            class="btn btn-outline-secondary rounded-pill py-2 text-sm fw-semibold d-flex align-items-center justify-content-center gap-2 opacity-60"
+                            onclick="showConfigNotice('Facebook', 'FACEBOOK_APP_ID and FACEBOOK_APP_SECRET')">
+                        <i class="bi bi-facebook text-primary fs-5"></i>
+                        <span>Continue with Facebook</span>
+                        <span class="badge bg-secondary-subtle text-secondary text-[10px] rounded-pill">Unconfigured</span>
+                    </button>
+                    {% endif %}
+
+                    <!-- Apple Login -->
+                    {% if providers.apple %}
+                    <a href="{{ url_for('oauth.apple_login') }}" 
+                       class="btn btn-outline-secondary rounded-pill py-2 text-sm fw-semibold d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-apple text-dark fs-5"></i>
+                        <span>Continue with Apple</span>
+                    </a>
+                    {% else %}
+                    <button type="button" 
+                            class="btn btn-outline-secondary rounded-pill py-2 text-sm fw-semibold d-flex align-items-center justify-content-center gap-2 opacity-60"
+                            onclick="showConfigNotice('Apple', 'APPLE_CLIENT_ID')">
+                        <i class="bi bi-apple text-dark fs-5"></i>
+                        <span>Continue with Apple</span>
+                        <span class="badge bg-secondary-subtle text-secondary text-[10px] rounded-pill">Unconfigured</span>
+                    </button>
+                    {% endif %}
+                </div>
+
+                <!-- Registration Footer -->
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted text-xs mb-0">
+                        Don't have a CareBuddy vault? 
+                        <a href="{{ url_for('auth.register') }}" class="text-primary fw-bold text-decoration-none ms-1">
+                            Create Account
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal: Provider Setup Information (No fake success) -->
+<div class="modal fade" id="configNoticeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-body p-4 text-center">
+                <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-3 mb-3">
+                    <i class="bi bi-gear-wide-connected fs-4"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-2" id="modalProviderTitle">Provider Setup</h5>
+                <p class="text-secondary text-xs mb-3" id="modalProviderMsg">
+                    This OAuth provider requires API credentials in your environment file.
+                </p>
+                <div class="bg-light p-2.5 rounded-3 text-start mb-3">
+                    <span class="text-xs text-muted d-block mb-1">Required in <code class="text-primary">.env</code>:</span>
+                    <code class="text-xs text-dark fw-bold d-block" id="modalEnvKey">KEY_NAME</code>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm w-100 rounded-pill fw-semibold" data-bs-dismiss="modal">
+                    Understood
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Password toggle
+const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+const loginPassword = document.getElementById('loginPassword');
+const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+if (togglePasswordBtn) {
+    togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = loginPassword.type === 'password';
+        loginPassword.type = isPassword ? 'text' : 'password';
+        togglePasswordIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+}
+
+// Double-submit prevention
+const loginForm = document.getElementById('loginForm');
+const submitLoginBtn = document.getElementById('submitLoginBtn');
+const loginBtnText = document.getElementById('loginBtnText');
+const loginSpinner = document.getElementById('loginSpinner');
+
+if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+        if (!loginForm.checkValidity()) return;
+        submitLoginBtn.disabled = true;
+        loginBtnText.textContent = 'Verifying credentials...';
+        loginSpinner.classList.remove('d-none');
+    });
+}
+
+// Clean notification for unconfigured providers (Strict anti-fake rule)
+function showConfigNotice(providerName, envKeys) {
+    document.getElementById('modalProviderTitle').textContent = `${providerName} Setup`;
+    document.getElementById('modalProviderMsg').textContent = `${providerName} authentication is not active because external OAuth credentials are not configured in your application environment.`;
+    document.getElementById('modalEnvKey').textContent = envKeys;
+    const modal = new bootstrap.Modal(document.getElementById('configNoticeModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

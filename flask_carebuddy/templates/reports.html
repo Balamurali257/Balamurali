@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Reports – CareBuddy Vault{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Header -->
+    <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Medical Reports & Diagnostics</h3>
+            <p class="text-muted text-sm mb-0">Search, filter, and access your encrypted medical documents</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('reports.upload') }}" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload Report
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="col-12">
+        <div class="card border-0 rounded-4 shadow-sm bg-white p-3">
+            <form method="GET" action="{{ url_for('reports.index') }}" class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 text-sm" placeholder="Search by report name, doctor, or hospital..." value="{{ search_query }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="category" class="form-select text-sm" onchange="this.form.submit()">
+                        <option value="">All Document Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary btn-sm w-100 py-2 rounded-pill fw-semibold">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="col-12">
+        <div class="card border-0 rounded-4 shadow-sm bg-white overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-sm">
+                    <thead class="table-light text-muted text-xs text-uppercase fw-bold">
+                        <tr>
+                            <th class="ps-4">Report Name</th>
+                            <th>Category</th>
+                            <th>Doctor & Hospital</th>
+                            <th>Date</th>
+                            <th>Size</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if reports %}
+                            {% for report in reports %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-3 p-2 text-white" style="background-color: {{ report.color_code or '#0284c7' }};">
+                                            <i class="bi {{ report.icon_class or 'bi-file-earmark-medical' }}"></i>
+                                        </div>
+                                        <div>
+                                            <strong class="text-dark d-block">{{ report.report_name }}</strong>
+                                            <small class="text-muted text-xs">{{ report.original_file_name }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill text-xs px-2.5 py-1" style="background-color: {{ report.color_code }}20; color: {{ report.color_code }};">
+                                        {{ report.category_name }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="d-block text-dark fw-semibold">{{ report.doctor_name or 'Not specified' }}</span>
+                                    <small class="text-muted text-xs">{{ report.hospital_name or '' }}</small>
+                                </td>
+                                <td class="text-muted">{{ report.report_date }}</td>
+                                <td class="text-muted text-xs">{{ (report.file_size_bytes / 1024)|round(1) }} KB</td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('reports.view_report', report_id=report.id) }}" class="btn btn-outline-secondary btn-sm" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('reports.download_file', filename=report.file_name) }}" class="btn btn-outline-secondary btn-sm" title="Download">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        <a href="{{ url_for('sharing.create_share', report_id=report.id) }}" class="btn btn-outline-primary btn-sm" title="Share via QR">
+                                            <i class="bi bi-qr-code"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-folder2-open fs-1 d-block mb-2 text-secondary-subtle"></i>
+                                    No medical reports match your filter criteria.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

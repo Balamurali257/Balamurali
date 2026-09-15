@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Shared Medical Document – CareBuddy Vault{% endblock %}
+
+{% block public_content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="text-center mb-4">
+                <div class="bg-primary text-white rounded-3 p-2 d-inline-flex align-items-center justify-content-center shadow-sm mb-2">
+                    <i class="bi bi-shield-lock-fill fs-3"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-0">CareBuddy Clinical Access Gate</h4>
+                <p class="text-muted text-xs">Zero-trust single-document view</p>
+            </div>
+
+            <div class="card border-0 rounded-4 shadow-sm bg-white p-4 text-center">
+                {% if status == 'expired' %}
+                <div class="py-4">
+                    <i class="bi bi-clock-history text-danger fs-1 d-block mb-2"></i>
+                    <h5 class="fw-bold text-dark">Access Pass Expired</h5>
+                    <p class="text-muted text-xs mb-0">This document share token has passed its expiration window. Please request a new QR pass from the patient.</p>
+                </div>
+                {% elif status == 'revoked' %}
+                <div class="py-4">
+                    <i class="bi bi-slash-circle text-danger fs-1 d-block mb-2"></i>
+                    <h5 class="fw-bold text-dark">Access Pass Revoked</h5>
+                    <p class="text-muted text-xs mb-0">The patient has revoked sharing access for this document.</p>
+                </div>
+                {% elif status == 'limit_reached' %}
+                <div class="py-4">
+                    <i class="bi bi-eye-slash text-warning fs-1 d-block mb-2"></i>
+                    <h5 class="fw-bold text-dark">View Limit Reached</h5>
+                    <p class="text-muted text-xs mb-0">This shared link has reached its maximum authorized view threshold.</p>
+                </div>
+                {% elif status == 'pin_required' %}
+                <div class="py-3">
+                    <i class="bi bi-key text-primary fs-1 d-block mb-2"></i>
+                    <h5 class="fw-bold text-dark">PIN Required</h5>
+                    <p class="text-muted text-xs mb-3">Please enter the 4-digit security PIN provided by {{ share.owner_name }}.</p>
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <div class="mb-3">
+                            <input type="password" name="pin" maxlength="4" class="form-control text-center fs-4 fw-bold font-monospace py-2" placeholder="••••" required autofocus>
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold w-100">
+                            Unlock Document
+                        </button>
+                    </form>
+                </div>
+                {% elif share %}
+                <!-- Document Details -->
+                <div class="text-start">
+                    <span class="badge bg-success-subtle text-success border rounded-pill px-3 py-1 mb-2 text-xs">
+                        <i class="bi bi-check-circle-fill me-1"></i> Authorized Medical Access
+                    </span>
+                    <h4 class="fw-bold text-dark mb-1">{{ share.report_name }}</h4>
+                    <p class="text-muted text-xs mb-3">Patient: <strong>{{ share.owner_name }}</strong> • Date: {{ share.report_date }}</p>
+
+                    <div class="bg-light rounded-3 p-3 mb-4 text-xs">
+                        <div class="row g-2">
+                            <div class="col-6"><strong>Hospital:</strong> {{ share.hospital_name or 'N/A' }}</div>
+                            <div class="col-6"><strong>Doctor:</strong> {{ share.doctor_name or 'N/A' }}</div>
+                            <div class="col-12 mt-2"><strong>Notes:</strong> {{ share.notes or 'None' }}</div>
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('reports.download_file', filename=share.file_name) }}" class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold">
+                        <i class="bi bi-file-earmark-arrow-down me-1"></i> Download / View Medical Document
+                    </a>
+                </div>
+                {% else %}
+                <div class="py-4">
+                    <i class="bi bi-exclamation-octagon text-muted fs-1 d-block mb-2"></i>
+                    <h5 class="fw-bold text-dark">Invalid Token</h5>
+                    <p class="text-muted text-xs mb-0">The share link is invalid or malformed.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

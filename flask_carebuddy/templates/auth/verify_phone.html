@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Phone Number – CareBuddy Vault{% endblock %}
+
+{% block public_content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
+            
+            <!-- Brand Logo -->
+            <div class="text-center mb-4">
+                <a href="{{ url_for('auth.landing') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                    <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
+                        <i class="bi bi-shield-check fs-3"></i>
+                    </div>
+                    <span class="fs-3 fw-bold text-dark tracking-tight">CareBuddy</span>
+                </a>
+            </div>
+
+            <!-- Verification Card -->
+            <div class="card border-0 rounded-4 shadow-sm p-4 p-sm-4 bg-white text-center">
+                <div class="mb-3">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-3 mb-2 shadow-xs">
+                        <i class="bi bi-phone-vibrate fs-3"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-1">Verify Mobile Number</h4>
+                    <p class="text-muted text-sm mb-2">
+                        To protect your medical records, enter the 6-digit verification code sent to:
+                    </p>
+                    
+                    <div class="d-inline-flex align-items-center gap-2 bg-light border px-3 py-1.5 rounded-pill mb-2">
+                        <span class="fw-bold text-dark text-sm tracking-wider">{{ masked_phone }}</span>
+                        <button type="button" class="btn btn-link btn-sm p-0 text-primary text-xs fw-semibold text-decoration-none" data-bs-toggle="modal" data-bs-target="#changePhoneModal">
+                            Edit
+                        </button>
+                    </div>
+
+                    <div>
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill text-[11px] px-2.5 py-1">
+                            Delivered via <strong class="text-dark">{{ channel | upper }}</strong>
+                        </span>
+                    </div>
+                </div>
+
+                {% if not twilio_ready %}
+                <div class="alert alert-warning text-xs text-start rounded-3 p-2.5 mb-3 border-0 bg-warning-subtle text-dark">
+                    <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                    <strong>Twilio Verify Not Configured:</strong> Set <code class="text-dark fw-bold">TWILIO_ACCOUNT_SID</code>, <code class="text-dark fw-bold">TWILIO_AUTH_TOKEN</code>, and <code class="text-dark fw-bold">TWILIO_VERIFY_SERVICE_SID</code> in <code class="text-dark fw-bold">.env</code> to deliver live SMS/WhatsApp codes.
+                </div>
+                {% endif %}
+
+                <!-- OTP Form -->
+                <form action="{{ url_for('auth.verify_phone_page') }}" method="POST" id="otpForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="otp_code" id="fullOtpInput">
+
+                    <!-- 6-digit OTP Inputs -->
+                    <div class="d-flex justify-content-center gap-2 mb-4" id="otpBoxContainer">
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control text-center fs-4 fw-bold rounded-3 otp-cell" style="width: 46px; height: 54px;" autofocus required>
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control text-center fs-4 fw-bold rounded-3 otp-cell" style="width: 46px; height: 54px;" required>
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control text-center fs-4 fw-bold rounded-3 otp-cell" style="width: 46px; height: 54px;" required>
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control text-center fs-4 fw-bold rounded-3 otp-cell" style="width: 46px; height: 54px;" required>
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control text-center fs-4 fw-bold rounded-3 otp-cell" style="width: 46px; height: 54px;" required>
+                        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="form-control text-center fs-4 fw-bold rounded-3 otp-cell" style="width: 46px; height: 54px;" required>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            id="submitOtpBtn" 
+                            class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 mb-3">
+                        <span id="otpBtnText">Confirm & Activate Vault</span>
+                        <div class="spinner-border spinner-border-sm d-none" id="otpSpinner" role="status"></div>
+                    </button>
+                </form>
+
+                <!-- Resend & Channel Switch Actions -->
+                <div class="pt-3 border-top">
+                    <div class="mb-2">
+                        <span class="text-muted text-xs" id="timerNotice">
+                            Didn't receive code? Resend available in <strong id="countdownTimer" class="text-primary">45</strong>s
+                        </span>
+                        <div class="d-none mt-2" id="resendOptions">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="button" 
+                                        class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 text-xs fw-semibold" 
+                                        onclick="resendCode('sms')">
+                                    <i class="bi bi-chat-text-fill me-1"></i> Resend SMS
+                                </button>
+                                
+                                {% if whatsapp_available %}
+                                <button type="button" 
+                                        class="btn btn-outline-success btn-sm rounded-pill px-3 py-1 text-xs fw-semibold" 
+                                        onclick="resendCode('whatsapp')">
+                                    <i class="bi bi-whatsapp me-1"></i> Send via WhatsApp
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Back to Sign In -->
+                <div class="mt-3">
+                    <a href="{{ url_for('auth.login') }}" class="text-muted text-xs text-decoration-none">
+                        <i class="bi bi-arrow-left me-1"></i> Return to Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Change Pending Phone -->
+<div class="modal fade" id="changePhoneModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title fw-bold text-dark">Update Phone Number</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('auth.change_pending_phone') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="modal-body py-3">
+                    <p class="text-muted text-xs mb-3">
+                        If you made a typo during sign up, enter your corrected mobile number with country code.
+                    </p>
+                    <label class="form-label text-xs fw-semibold text-dark mb-1">New Mobile Number</label>
+                    <input type="tel" name="new_phone" class="form-control text-sm py-2" placeholder="+919876543210" required>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">Save & Send Code</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// OTP Input Box Logic: auto-advance, backspace, and paste support
+const otpCells = Array.from(document.querySelectorAll('.otp-cell'));
+const fullOtpInput = document.getElementById('fullOtpInput');
+const otpForm = document.getElementById('otpForm');
+const submitOtpBtn = document.getElementById('submitOtpBtn');
+const otpBtnText = document.getElementById('otpBtnText');
+const otpSpinner = document.getElementById('otpSpinner');
+
+function syncOtpValue() {
+    const code = otpCells.map(c => c.value).join('');
+    fullOtpInput.value = code;
+}
+
+otpCells.forEach((cell, index) => {
+    cell.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, '');
+        cell.value = val ? val.slice(-1) : '';
+        syncOtpValue();
+
+        if (cell.value && index < otpCells.length - 1) {
+            otpCells[index + 1].focus();
+        }
+    });
+
+    cell.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !cell.value && index > 0) {
+            otpCells[index - 1].focus();
+        }
+    });
+
+    cell.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text').trim();
+        const digits = text.replace(/[^0-9]/g, '').slice(0, 6).split('');
+        digits.forEach((d, i) => {
+            if (otpCells[i]) otpCells[i].value = d;
+        });
+        syncOtpValue();
+        const nextIndex = Math.min(digits.length, otpCells.length - 1);
+        otpCells[nextIndex].focus();
+    });
+});
+
+if (otpForm) {
+    otpForm.addEventListener('submit', (e) => {
+        syncOtpValue();
+        if (fullOtpInput.value.length !== 6) {
+            e.preventDefault();
+            alert('Please enter all 6 digits of the verification code.');
+            return;
+        }
+        submitOtpBtn.disabled = true;
+        otpBtnText.textContent = 'Verifying code...';
+        otpSpinner.classList.remove('d-none');
+    });
+}
+
+// Resend Countdown
+let countdown = 45;
+const countdownTimer = document.getElementById('countdownTimer');
+const timerNotice = document.getElementById('timerNotice');
+const resendOptions = document.getElementById('resendOptions');
+
+const timerInterval = setInterval(() => {
+    countdown--;
+    if (countdownTimer) countdownTimer.textContent = countdown;
+    if (countdown <= 0) {
+        clearInterval(timerInterval);
+        if (timerNotice) timerNotice.classList.add('d-none');
+        if (resendOptions) resendOptions.classList.remove('d-none');
+    }
+}, 1000);
+
+// Resend Code Trigger
+function resendCode(channel) {
+    const formData = new FormData();
+    formData.append('csrf_token', '{{ csrf_token }}');
+    formData.append('channel', channel);
+
+    fetch("{{ url_for('auth.resend_otp') }}", {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message || `Code dispatched via ${channel.toUpperCase()}`);
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to dispatch code.');
+        }
+    })
+    .catch(err => {
+        alert('Network error while requesting code.');
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Verify New Phone – CareBuddy Vault{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
+        <div class="card border-0 rounded-4 shadow-sm bg-white p-4 text-center">
+            <div class="mb-3">
+                <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex p-3 mb-2">
+                    <i class="bi bi-shield-check fs-3"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-1">Verify New Phone</h4>
+                <p class="text-muted text-xs mb-1">
+                    Enter the 6-digit verification code sent to:
+                </p>
+                <div class="badge bg-light text-dark border px-3 py-1.5 rounded-pill fw-bold text-sm">
+                    {{ masked_phone }}
+                </div>
+            </div>
+
+            <form action="{{ url_for('auth.change_phone_verify_page') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="mb-4">
+                    <input type="text" 
+                           name="otp" 
+                           maxlength="6" 
+                           inputmode="numeric" 
+                           pattern="[0-9]{6}" 
+                           class="form-control text-center fs-4 fw-bold tracking-widest py-2 rounded-3" 
+                           placeholder="123456" 
+                           required 
+                           autofocus>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold shadow-sm mb-3">
+                    Verify & Update Phone
+                </button>
+            </form>
+
+            <a href="{{ url_for('auth.connected_accounts') }}" class="text-muted text-xs text-decoration-none">
+                <i class="bi bi-x-circle me-1"></i> Cancel Phone Change
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
